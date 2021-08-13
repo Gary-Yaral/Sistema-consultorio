@@ -1,12 +1,37 @@
 
 package consultorio;
 
-public class Hospital extends javax.swing.JFrame {
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Hospital extends javax.swing.JFrame {
+    String ruta_carpeta, archivoCitas,archivoConsultorios,archivoMedicamentos;
     /* Método Constructor */
-    public Hospital() {
+    public Hospital() throws IOException {
+        crearCarpeta();
+        crearArchivos();  
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
+    }
+    
+    private void crearCarpeta(){
+        //Establecemos la ruta
+        ruta_carpeta = "C:/Hospital";
+        
+        //Creamos la carpeta 
+        Directorio carpeta = new Directorio();
+        carpeta.crearDirectorio(ruta_carpeta);
+    }
+    
+    private void crearArchivos() throws IOException{
+        archivoCitas = "Citas.txt";
+        archivoConsultorios = "Consultorios.txt";
+        archivoMedicamentos = "Medicamentos.txt";
+        new Archivo().crear(ruta_carpeta,archivoCitas);
+        new Archivo().crear(ruta_carpeta,archivoConsultorios);
+        new Archivo().crear(ruta_carpeta,archivoMedicamentos);
     }
 
     /* Código de creación de componentes */
@@ -115,12 +140,18 @@ public class Hospital extends javax.swing.JFrame {
     
     /* Eventos y Métodos de la clase principal */
     private void opcionesCitasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opcionesCitasActionPerformed
-        Agendar agendar = new Agendar();
-        int x = (escritorio.getWidth() - agendar.getWidth())/2;
-        int y = (escritorio.getHeight() - agendar.getHeight())/2;
-        agendar.setLocation(x,y);
-        escritorio.add(agendar);
-        agendar.show();
+        
+        try {
+            Agendar agendar;
+            agendar = new Agendar(ruta_carpeta + "/"+ archivoCitas);
+            int x = (escritorio.getWidth() - agendar.getWidth())/2;
+            int y = (escritorio.getHeight() - agendar.getHeight())/2;
+            agendar.setLocation(x,y);
+            escritorio.add(agendar);
+            agendar.show();
+        } catch (IOException ex) {
+            Logger.getLogger(Hospital.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_opcionesCitasActionPerformed
 
     private void verConsultoriosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verConsultoriosActionPerformed
@@ -159,7 +190,7 @@ public class Hospital extends javax.swing.JFrame {
         escritorio.add(todosLosMedicamentos);
         todosLosMedicamentos.show();
     }//GEN-LAST:event_verMedicamentosActionPerformed
-        
+       
     
     /* Método principal desde donde arrancará el sistema */
     public static void main(String args[]) {
@@ -190,7 +221,11 @@ public class Hospital extends javax.swing.JFrame {
         /* Se crea y se ejecuta el sistema */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Hospital().setVisible(true);
+                try {
+                    new Hospital().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(Hospital.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
