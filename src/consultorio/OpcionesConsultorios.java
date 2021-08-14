@@ -26,7 +26,7 @@ public class OpcionesConsultorios {
         try{
             fw = new FileWriter(ruta);
             bw = new BufferedWriter(fw);
-            int indice = 0;
+            int indice = 1;
             for(String i: consultorio){
                 bw.write(indice + "," + i);
                 bw.flush();

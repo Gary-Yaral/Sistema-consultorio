@@ -23,6 +23,7 @@ public class Agendar extends javax.swing.JInternalFrame {
     OpcionesArchivo opciones = new OpcionesArchivo();
     String ruta = "C:\\Hospital\\Citas.txt";
     String temporal = "C:\\Hospital\\temporal.txt";
+    String rutaConsultorio = "C:\\Hospital\\Consultorios.txt";
     int siguienteIndice = opciones.calcularSiguienteIndice(ruta);
     
     public Agendar(String nombre_archivo) throws IOException {
@@ -33,7 +34,8 @@ public class Agendar extends javax.swing.JInternalFrame {
  
         long f_cita = fechaCita.getDate().getTime();
         java.sql.Date fecha_cita = new java.sql.Date(f_cita);
-        agregarHoras(fecha_cita);
+        agregarHoras();
+        agregarConsultorios();
         resetearIndice();
         llenarTable();
         
@@ -181,8 +183,6 @@ public class Agendar extends javax.swing.JInternalFrame {
             }
         });
 
-        consultoriosDisponibles.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         nombrePaciente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nombrePacienteActionPerformed(evt);
@@ -206,27 +206,25 @@ public class Agendar extends javax.swing.JInternalFrame {
                         .addComponent(jScrollPane3)
                         .addGroup(jPanel1Layout.createSequentialGroup()
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(consultoriosDisponibles, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(fechaNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(nombrePaciente)
                                 .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(fechaNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                                        .addComponent(jLabel4)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel7)
                                         .addComponent(jLabel1)
-                                        .addComponent(nombrePaciente))
-                                    .addGap(25, 25, 25)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jLabel5)
-                                        .addComponent(fechaCita, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                                        .addComponent(apellidoPaterno)))
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(jLabel7)
-                                            .addGap(38, 38, 38))
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(consultoriosDisponibles, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addGap(25, 25, 25)))
-                                    .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jLabel4))
+                                    .addGap(0, 13, Short.MAX_VALUE)))
+                            .addGap(25, 25, 25)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel5)
+                                    .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(fechaCita, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGap(1, 1, 1)))
+                                .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGap(25, 25, 25)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(jPanel1Layout.createSequentialGroup()
@@ -269,11 +267,9 @@ public class Agendar extends javax.swing.JInternalFrame {
                             .addComponent(jLabel1)
                             .addComponent(jLabel3)
                             .addComponent(jLabel8))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(2, 2, 2)
+                                .addGap(8, 8, 8)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(nombrePaciente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -287,7 +283,10 @@ public class Agendar extends javax.swing.JInternalFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(fechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(fechaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(horaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(horaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING))
                 .addGap(11, 11, 11)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -421,46 +420,45 @@ public class Agendar extends javax.swing.JInternalFrame {
         }	
     }
     
-    public void agregarHoras(java.sql.Date fecha_cita) throws IOException {
-    	String fecha_seleccionada,linea; 
-        try (BufferedReader lectorDeArchivo = new BufferedReader( new FileReader(nombreDeArchivo) )) {
-            fecha_seleccionada = String.valueOf(fecha_cita);
-            existeEsaFecha = false;
-            existeEsaHora = false;
-            existeEseConsultorio = false;
-            ArrayList datos = new ArrayList();
-           String[] horasOcupadas = {"09h00","10h00","11h00","12h00","13h00","14h00","15h00","16h00"};
-                     
-            while( ( linea = lectorDeArchivo.readLine() ) != null ) {
-                
+    public void agregarHoras(){     
+        String[] horasOcupadas = {"09h00","10h00","11h00","12h00","13h00","14h00","15h00","16h00"};
+        for (String horasOcupada : horasOcupadas) {
+            if (horasOcupada != null) {
+                horaCita.addItem(horasOcupada);           
+            }
+        }  		
+    }
+    
+    private void agregarConsultorios(){
+        BufferedReader br = null;
+        String linea;
+        try{
+            br = new BufferedReader( new FileReader(rutaConsultorio));
+            
+            while( ( linea = br.readLine() ) != null ) {
+                Object[] datos = new Object[2];
+                int i = 0;
                 StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
                 
                 while(cadenaDeTexto.hasMoreTokens()){  
                     String token = cadenaDeTexto.nextToken();
-                    datos.add(token);     
-                }
+                    datos[i] = token;
+                    i++;
+                } 
                 
-                if(datos.get(5).toString().equals(fecha_seleccionada)){
-                    for(int j = 0; j<horasOcupadas.length; j++){
-                        if(datos.get(6).toString().equals(horasOcupadas[j])){
-                            horasOcupadas[j] = null;
-                        }
-                    }
-                }
-                  
-                datos.clear();
-            } 
-            
-                        
-            
-            for(int j = 0; j<horasOcupadas.length; j++){
-                if(horasOcupadas[j]!= null){
-                    horaCita.addItem(horasOcupadas[j]);           
-                }
+                consultoriosDisponibles.addItem(datos[1]);           
             }
-        }   		
+                
+            
+        }catch(IOException e){
+            System.out.println("Error al cargar horas: " + e.getMessage());
+        } finally{
+            try{
+                br.close();
+            }catch(IOException e){
+            }
+        } 
     }
-    
     
     private void limpiarCampos(){
         nombrePaciente.setText("");
@@ -494,12 +492,12 @@ public class Agendar extends javax.swing.JInternalFrame {
         tablaCitas.setModel(modelo);
         modelo.setRowCount(0);
         String linea; 
-        BufferedReader lectorDeArchivo = null;
+        BufferedReader br = null;
         try {
    
-             lectorDeArchivo = new BufferedReader( new FileReader(nombreDeArchivo));      
+             br = new BufferedReader( new FileReader(nombreDeArchivo));      
    
-            while( ( linea = lectorDeArchivo.readLine() ) != null ) {
+            while( ( linea = br.readLine() ) != null ) {
                 Object[] datos = new Object[9];
                 int i = 0;
                 StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
@@ -520,7 +518,7 @@ public class Agendar extends javax.swing.JInternalFrame {
             System.out.println("Error en el buffer al llenar tabla: " + e.getMessage());
         }  finally{
             try{
-                lectorDeArchivo.close();
+                br.close();
             }catch(IOException e){
                 System.out.println("Error al cerrar buffer al llenar tabla: " + e.getMessage());
             }
