@@ -32,6 +32,10 @@ public class Hospital extends javax.swing.JFrame {
         new Archivo().crear(ruta_carpeta,archivoCitas);
         new Archivo().crear(ruta_carpeta,archivoConsultorios);
         new Archivo().crear(ruta_carpeta,archivoMedicamentos);
+        //Rellenamos el archivo Consultorios
+        OpcionesConsultorios consultorios = new OpcionesConsultorios();
+        String rutaConsultorio = ruta_carpeta+"/"+archivoConsultorios;
+        consultorios.agregarTodos(rutaConsultorio);
     }
 
     /* Código de creación de componentes */
@@ -190,7 +194,7 @@ public class Hospital extends javax.swing.JFrame {
         escritorio.add(todosLosMedicamentos);
         todosLosMedicamentos.show();
     }//GEN-LAST:event_verMedicamentosActionPerformed
-       
+     
     
     /* Método principal desde donde arrancará el sistema */
     public static void main(String args[]) {
