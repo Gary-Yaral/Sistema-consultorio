@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
@@ -25,6 +27,7 @@ public class Agendar extends javax.swing.JInternalFrame {
     String temporal = "C:\\Hospital\\temporal.txt";
     String rutaConsultorio = "C:\\Hospital\\Consultorios.txt";
     int siguienteIndice = opciones.calcularSiguienteIndice(ruta);
+    String indiceDeRepetido = "0";
     
     public Agendar(String nombre_archivo) throws IOException {
         initComponents();
@@ -390,30 +393,41 @@ public class Agendar extends javax.swing.JInternalFrame {
     
     public void buscarRepetido(java.sql.Date fecha_cita,String hora_cita, String consultorio_seleccionado){
     	String fecha_seleccionada,linea;
-        BufferedReader lectorDeArchivo = null;
+        BufferedReader br = null;
         try {
-            lectorDeArchivo = new BufferedReader( new FileReader(nombreDeArchivo) );
+            br = new BufferedReader( new FileReader(nombreDeArchivo) );
             fecha_seleccionada = String.valueOf(fecha_cita);
             existeEsaFecha = false;
             existeEsaHora = false;
             existeEseConsultorio = false;
-
-            while( ( linea = lectorDeArchivo.readLine() ) != null ) {
-                
+         
+            while( ( linea = br.readLine() ) != null ) {
+                Object[] datos = new Object[9];
+                int i = 0;
                 StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
-                
-                while(cadenaDeTexto.hasMoreTokens()){
+
+                while(cadenaDeTexto.hasMoreTokens()){  
                     String token = cadenaDeTexto.nextToken();
-                    if(token.equals(fecha_seleccionada)) existeEsaFecha = true;  
-                    if(token.equals(hora_cita))existeEsaHora = true;
-                    if(token.equals(consultorio_seleccionado))existeEseConsultorio = true;
+                    datos[i] = token;
+                    i++;
+                }
+                
+                boolean existeLaFecha = datos[5].toString().equals(fecha_seleccionada);
+                boolean existeLaHora = datos[6].toString().equals(hora_cita);
+                boolean estaOcupado = datos[7].toString().equals(consultorio_seleccionado);
+                
+                if(existeLaFecha && existeLaHora && estaOcupado){
+                    existeEsaFecha = true;  
+                    existeEsaHora = true;
+                    existeEseConsultorio = true;
+                    indiceDeRepetido = datos[0].toString();
                 }                        
             }           
         } catch(IOException e){
             System.out.println("Error al buscar repetido: " + e.getMessage());
         } finally{
             try{
-                lectorDeArchivo.close();
+                br.close();
             }catch(IOException e){
                 System.out.println("Error al cerrar bufferWriter en buscarRepetidos");
             }
@@ -549,7 +563,25 @@ public class Agendar extends javax.swing.JInternalFrame {
                 buscarRepetido(fecha_cita, hora_cita, consultorio_seleccionado);
                 
                 if(existeEsaFecha.equals(true) && existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
-                    JOptionPane.showMessageDialog(null, "Lo sentimos, este horario no está disponible");
+                                        
+                    if(indiceCita.getText().equals(indiceDeRepetido)){
+                        String [] nuevosDatos = new String[9];
+                        nuevosDatos[0] = indiceCita.getText();
+                        nuevosDatos[1] = nombrePaciente.getText();
+                        nuevosDatos[2] = apellidoPaterno.getText();
+                        nuevosDatos[3] = apellidoMaterno.getText();
+                        nuevosDatos[4] = String.valueOf(fecha_nacimiento);
+                        nuevosDatos[5] = String.valueOf(fecha_cita);
+                        nuevosDatos[6] = horaCita.getSelectedItem().toString();
+                        nuevosDatos[7] = consultoriosDisponibles.getSelectedItem().toString();
+                        nuevosDatos[8] = descripcion.getText();  
+                        opciones.modificar(ruta, temporal, nuevosDatos);
+                        resetearIndice();
+                        limpiarCampos();
+                        llenarTable();
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Lo sentimos, este horario no está disponible: " );
+                    }
                 }else{   
                     
                     String [] nuevosDatos = new String[9];
@@ -601,11 +633,40 @@ public class Agendar extends javax.swing.JInternalFrame {
         apellidoPaterno.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 2)));
         apellidoMaterno.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 3)));
         descripcion.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 8)));
-        /*nombrePaciente.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 1)));
-        apellidoPaterno.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 2)));
+        int indiceHora = 0;
+        int indiceConsultorio = 0;
+        for(int i = 0; i < horaCita.getItemCount(); i++){
+            horaCita.setSelectedIndex(i);
+            if(String.valueOf(tablaCitas.getValueAt(indiceFila, 6)).equals(horaCita.getSelectedItem().toString())){
+                indiceHora = i;
+            }
+        }
+        horaCita.setSelectedIndex(indiceHora);
         
+        for(int i = 0; i < horaCita.getItemCount(); i++){
+            consultoriosDisponibles.setSelectedIndex(i);
+            if(String.valueOf(tablaCitas.getValueAt(indiceFila, 7)).equals(consultoriosDisponibles.getSelectedItem().toString())){
+                indiceConsultorio = i;
+            }
+        }
+        consultoriosDisponibles.setSelectedIndex(indiceConsultorio);
         
-        */
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
+        Date nuevaFechaNacimiento;
+        try{
+            nuevaFechaNacimiento = formatoFecha.parse(String.valueOf(tablaCitas.getValueAt(indiceFila, 4)));
+            fechaNacimiento.setDate(nuevaFechaNacimiento);
+        }catch(ParseException e){
+            System.out.println("Error al transformar fecha nacimiento: " + e.getMessage());
+        }
+        
+        Date nuevaFechaCita;
+        try{
+            nuevaFechaCita = formatoFecha.parse(String.valueOf(tablaCitas.getValueAt(indiceFila, 5)));
+            fechaCita.setDate(nuevaFechaCita);
+        }catch(ParseException e){
+            System.out.println("Error al transformar fecha cita: " + e.getMessage());
+        }
     }//GEN-LAST:event_tablaCitasMouseClicked
     
     private void inicializarFechas(){
