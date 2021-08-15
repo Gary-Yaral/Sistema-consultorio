@@ -209,6 +209,9 @@
         <Component class="com.toedter.calendar.JDateChooser" name="fechaNacimiento">
         </Component>
         <Component class="com.toedter.calendar.JDateChooser" name="fechaCita">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="fechaCita.getDateEditor().addPropertyChangeListener(&#xa;(PropertyChangeEvent evt) -&gt; {&#xa;&#xa;        fecha++;&#xa;        if(haIniciado != true){&#xa;            if(fecha == 4){&#xa;                haIniciado = true;&#xa;                fecha = 0;&#xa;            }&#xa;        }&#xa;        if(haIniciado == true){&#xa;            if(fecha == 3){&#xa;                fecha = 0;&#xa;                System.out.println(&quot;Ready&quot;);&#xa;            }&#xa;        }    &#xa;});"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>

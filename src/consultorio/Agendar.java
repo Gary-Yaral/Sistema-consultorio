@@ -1,6 +1,7 @@
 
 package consultorio;
 
+import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -9,7 +10,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
@@ -28,6 +28,8 @@ public class Agendar extends javax.swing.JInternalFrame {
     String rutaConsultorio = "C:\\Hospital\\Consultorios.txt";
     int siguienteIndice = opciones.calcularSiguienteIndice(ruta);
     String indiceDeRepetido = "0";
+    int fecha = 0;
+    boolean haIniciado = false;
     
     public Agendar(String nombre_archivo) throws IOException {
         initComponents();
@@ -307,19 +309,37 @@ public class Agendar extends javax.swing.JInternalFrame {
                 .addGap(40, 40, 40))
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+        fechaCita.getDateEditor().addPropertyChangeListener(
+            (PropertyChangeEvent evt) -> {
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+                fecha++;
+                if(haIniciado != true){
+                    if(fecha == 4){
+                        haIniciado = true;
+                        fecha = 0;
+                    }
+                }
+                if(haIniciado == true){
+                    if(fecha == 3){
+                        fecha = 0;
+                        System.out.println("Ready");
+                    }
+                }
+            });
+
+            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+            getContentPane().setLayout(layout);
+            layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+            layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            );
+
+            pack();
+        }// </editor-fold>//GEN-END:initComponents
 
     private void resetearIndice(){
         siguienteIndice = opciones.calcularSiguienteIndice(ruta);
@@ -733,17 +753,5 @@ public class Agendar extends javax.swing.JInternalFrame {
     private javax.swing.JTextField nombrePaciente;
     private javax.swing.JTable tablaCitas;
     // End of variables declaration//GEN-END:variables
-
-    /*
-        fechaCita.getDateEditor().addPropertyChangeListener(new java.beans.PropertyChangeListener(){
-        public void propertyChange(java.beans.PropertyChangeEvent evt){
-        
-        saludar();
-        
-    }
-});
-    */
-    
-        
-        
+       
 }
