@@ -388,7 +388,7 @@ public class Agendar extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_guardarCitaActionPerformed
 
     
-    public void buscarRepetido(java.sql.Date fecha_cita,String hora_cita, String consultorio_seleccionado) throws IOException {
+    public void buscarRepetido(java.sql.Date fecha_cita,String hora_cita, String consultorio_seleccionado){
     	String fecha_seleccionada,linea;
         BufferedReader lectorDeArchivo = null;
         try {
@@ -447,9 +447,7 @@ public class Agendar extends javax.swing.JInternalFrame {
                 } 
                 
                 consultoriosDisponibles.addItem(datos[1]);           
-            }
-                
-            
+            }            
         }catch(IOException e){
             System.out.println("Error al cargar horas: " + e.getMessage());
         } finally{
@@ -491,39 +489,42 @@ public class Agendar extends javax.swing.JInternalFrame {
        
         tablaCitas.setModel(modelo);
         modelo.setRowCount(0);
-        String linea; 
-        BufferedReader br = null;
-        try {
-   
-             br = new BufferedReader( new FileReader(nombreDeArchivo));      
-   
-            while( ( linea = br.readLine() ) != null ) {
-                Object[] datos = new Object[9];
-                int i = 0;
-                StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
-                
-                while(cadenaDeTexto.hasMoreTokens()){  
-                    String token = cadenaDeTexto.nextToken();
-                    datos[i] = token;
-                    i++;
-                }
-                DefaultTableModel nuevoModelo = (DefaultTableModel)tablaCitas.getModel();
-                nuevoModelo.addRow(datos);
-                tablaCitas.setModel(nuevoModelo); 
-                
-            }     
-        } catch (FileNotFoundException e) {
-            System.out.println("Archivo no encontrado en llenar tabla: " + e.getMessage());
-        } catch(IOException e){
-            System.out.println("Error en el buffer al llenar tabla: " + e.getMessage());
-        }  finally{
-            try{
-                br.close();
-            }catch(IOException e){
-                System.out.println("Error al cerrar buffer al llenar tabla: " + e.getMessage());
-            }
-        }
+        
+        if(opciones.calcularSiguienteIndice(ruta) > 0){
             
+            String linea; 
+            BufferedReader br = null;
+            try {
+
+                 br = new BufferedReader( new FileReader(nombreDeArchivo));      
+
+                while( ( linea = br.readLine() ) != null ) {
+                    Object[] datos = new Object[9];
+                    int i = 0;
+                    StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
+
+                    while(cadenaDeTexto.hasMoreTokens()){  
+                        String token = cadenaDeTexto.nextToken();
+                        datos[i] = token;
+                        i++;
+                    }
+                    DefaultTableModel nuevoModelo = (DefaultTableModel)tablaCitas.getModel();
+                    nuevoModelo.addRow(datos);
+                    tablaCitas.setModel(nuevoModelo); 
+
+                }     
+            } catch (FileNotFoundException e) {
+                System.out.println("Archivo no encontrado en llenar tabla: " + e.getMessage());
+            } catch(IOException e){
+                System.out.println("Error en el buffer al llenar tabla: " + e.getMessage());
+            }  finally{
+                try{
+                    br.close();
+                }catch(IOException e){
+                    System.out.println("Error al cerrar buffer al llenar tabla: " + e.getMessage());
+                }
+            }
+        } 
     }
     
     private void eliminarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarCitaActionPerformed
@@ -536,13 +537,47 @@ public class Agendar extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_eliminarCitaActionPerformed
     
-    
+    private void modificarCita(){
+        if(!indiceCita.getText().equals("")){
+            if(validarCampos() != null){
+                long f_nacimiento = fechaNacimiento.getDate().getTime();
+                java.sql.Date fecha_nacimiento = new java.sql.Date(f_nacimiento);
+                long f_cita = fechaCita.getDate().getTime();
+                java.sql.Date fecha_cita = new java.sql.Date(f_cita);
+                String hora_cita = horaCita.getSelectedItem().toString();
+                String consultorio_seleccionado = consultoriosDisponibles.getSelectedItem().toString();
+                buscarRepetido(fecha_cita, hora_cita, consultorio_seleccionado);
+                
+                if(existeEsaFecha.equals(true) && existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
+                    JOptionPane.showMessageDialog(null, "Lo sentimos, este horario no está disponible");
+                }else{   
+                    
+                    String [] nuevosDatos = new String[9];
+                    nuevosDatos[0] = indiceCita.getText();
+                    nuevosDatos[1] = nombrePaciente.getText();
+                    nuevosDatos[2] = apellidoPaterno.getText();
+                    nuevosDatos[3] = apellidoMaterno.getText();
+                    nuevosDatos[4] = String.valueOf(fecha_nacimiento);
+                    nuevosDatos[5] = String.valueOf(fecha_cita);
+                    nuevosDatos[6] = horaCita.getSelectedItem().toString();
+                    nuevosDatos[7] = consultoriosDisponibles.getSelectedItem().toString();
+                    nuevosDatos[8] = descripcion.getText();  
+                    opciones.modificar(ruta, temporal, nuevosDatos);
+                    resetearIndice();
+                    limpiarCampos();
+                    llenarTable();
+                }
+            }
+        }
+  
+    }
     
     private void modificarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modificarCitaActionPerformed
-        
+        modificarCita();
     }//GEN-LAST:event_modificarCitaActionPerformed
 
     private void limpiarCamposActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpiarCamposActionPerformed
+        resetearIndice();
         limpiarCampos();
     }//GEN-LAST:event_limpiarCamposActionPerformed
 
