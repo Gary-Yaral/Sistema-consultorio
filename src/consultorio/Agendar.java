@@ -1,7 +1,6 @@
 
 package consultorio;
 
-import java.beans.PropertyChangeEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -10,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
@@ -18,7 +18,6 @@ import javax.swing.table.DefaultTableModel;
 public class Agendar extends javax.swing.JInternalFrame {
    
     String nombreDeArchivo;
-    Boolean existeEsaFecha = false;
     Boolean existeEsaHora = false;
     Boolean existeEseConsultorio = false;
     String[] horas;
@@ -28,18 +27,17 @@ public class Agendar extends javax.swing.JInternalFrame {
     String rutaConsultorio = "C:\\Hospital\\Consultorios.txt";
     int siguienteIndice = opciones.calcularSiguienteIndice(ruta);
     String indiceDeRepetido = "0";
-    int fecha = 0;
-    boolean haIniciado = false;
+    Horas listaHoras = new Horas();
+    String horaSeleccionada,consultorioCargado;
+    
+    boolean haSeleccionadoTabla = false;
     
     public Agendar(String nombre_archivo) throws IOException {
         initComponents();
         inicializarFechas();
         nombreDeArchivo = nombre_archivo;
-        //Procesamos las fechas para convertirlas al formato '01-01-2000'
- 
-        long f_cita = fechaCita.getDate().getTime();
-        java.sql.Date fecha_cita = new java.sql.Date(f_cita);
-        agregarHoras();
+        listaHoras.inicializar(ruta, horaCita);
+        consultoriosDisponibles.removeAllItems();
         agregarConsultorios();
         resetearIndice();
         llenarTable();
@@ -55,12 +53,10 @@ public class Agendar extends javax.swing.JInternalFrame {
         jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         fechaNacimiento = new com.toedter.calendar.JDateChooser();
-        fechaCita = new com.toedter.calendar.JDateChooser();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -108,8 +104,6 @@ public class Agendar extends javax.swing.JInternalFrame {
 
         jLabel4.setText("Fecha de Nacimiento");
 
-        jLabel5.setText("Fecha de la cita");
-
         jLabel6.setText("Hora de la cita");
 
         jLabel7.setText("Consultorios disponible");
@@ -134,7 +128,7 @@ public class Agendar extends javax.swing.JInternalFrame {
 
         eliminarCita.setBackground(new java.awt.Color(255, 0, 51));
         eliminarCita.setForeground(new java.awt.Color(255, 255, 255));
-        eliminarCita.setText("Eliminar");
+        eliminarCita.setText("Cancelar");
         eliminarCita.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 eliminarCitaActionPerformed(evt);
@@ -177,6 +171,11 @@ public class Agendar extends javax.swing.JInternalFrame {
         });
         jScrollPane3.setViewportView(tablaCitas);
 
+        horaCita.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                horaCitaItemStateChanged(evt);
+            }
+        });
         horaCita.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 horaCitaMouseClicked(evt);
@@ -207,54 +206,51 @@ public class Agendar extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(40, 40, 40)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane3)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(consultoriosDisponibles, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(fechaNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(nombrePaciente)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel7)
-                                        .addComponent(jLabel1)
-                                        .addComponent(jLabel4))
-                                    .addGap(0, 13, Short.MAX_VALUE)))
-                            .addGap(25, 25, 25)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel5)
-                                    .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(fechaCita, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGap(1, 1, 1)))
-                                .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(25, 25, 25)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel3)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(horaCita, 0, 122, Short.MAX_VALUE)
-                                            .addComponent(modificarCita, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
-                                            .addComponent(apellidoMaterno))
-                                        .addComponent(jLabel6))
-                                    .addGap(25, 25, 25)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jLabel8)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(eliminarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(25, 25, 25)
-                                            .addComponent(limpiarCampos, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(jScrollPane1)))
-                                .addComponent(jLabel9))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(indiceCita)
-                        .addGap(30, 30, 30)))
-                .addGap(40, 40, 40))
+                        .addGap(70, 70, 70))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(fechaNacimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(nombrePaciente)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(jLabel1)
+                                                .addComponent(jLabel4))
+                                            .addGap(23, 23, 23)))
+                                    .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(25, 25, 25)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(horaCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(modificarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(24, 24, 24)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel3)
+                                            .addComponent(apellidoMaterno, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel7)
+                                            .addComponent(consultoriosDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel9))
+                                        .addGap(26, 26, 26)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel8)
+                                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(25, 25, 25)
+                                        .addComponent(eliminarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(25, 25, 25)
+                                        .addComponent(limpiarCampos, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(40, 40, 40))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,80 +262,57 @@ public class Agendar extends javax.swing.JInternalFrame {
                     .addComponent(jLabel10)
                     .addComponent(indiceCita))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel8))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(nombrePaciente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(apellidoMaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(fechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(fechaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(horaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING))
-                .addGap(11, 11, 11)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(modificarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(eliminarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(limpiarCampos, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
+                        .addGap(2, 2, 2)
+                        .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(consultoriosDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(apellidoPaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(apellidoMaterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(nombrePaciente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(fechaNacimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(horaCita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(consultoriosDisponibles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(guardarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(modificarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(eliminarCita, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(limpiarCampos, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(31, 31, 31)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40))
         );
 
-        fechaCita.getDateEditor().addPropertyChangeListener(
-            (PropertyChangeEvent evt) -> {
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
-                fecha++;
-                if(haIniciado != true){
-                    if(fecha == 4){
-                        haIniciado = true;
-                        fecha = 0;
-                    }
-                }
-                if(haIniciado == true){
-                    if(fecha == 3){
-                        fecha = 0;
-                        System.out.println("Ready");
-                    }
-                }
-            });
-
-            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-            getContentPane().setLayout(layout);
-            layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            );
-            layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            );
-
-            pack();
-        }// </editor-fold>//GEN-END:initComponents
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
 
     private void resetearIndice(){
         siguienteIndice = opciones.calcularSiguienteIndice(ruta);
@@ -347,77 +320,76 @@ public class Agendar extends javax.swing.JInternalFrame {
     }
     
     private void guardarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarCitaActionPerformed
-        if(validarCampos() != null){
-            BufferedWriter flujo = null;
-            try {
-                
-                flujo = new BufferedWriter( new FileWriter(nombreDeArchivo,true));
-    
-                //Extraemos los datos de los campos de texto
-                int numeroDeCita = siguienteIndice;
-                String nombre_paciente = nombrePaciente.getText();
-                String apellido_paterno = apellidoPaterno.getText();
-                String apellido_materno = apellidoMaterno.getText();
-                String descripcion_cita = descripcion.getText();
+        if(indiceCita.getText().equals(String.valueOf(siguienteIndice))){
+            if(validarCampos() != null){
+                BufferedWriter flujo = null;
+                try {
 
-                //Procesamos las fechas para convertirlas al formato '01-01-2000'
-                long f_nacimiento = fechaNacimiento.getDate().getTime();
-                long f_cita = fechaCita.getDate().getTime();
-                java.sql.Date fecha_nacimiento = new java.sql.Date(f_nacimiento);
-                java.sql.Date fecha_cita = new java.sql.Date(f_cita);
+                    flujo = new BufferedWriter( new FileWriter(nombreDeArchivo,true));
 
-                //Extreamos los datos de las listas o ComboBox 
-                String hora_cita = horaCita.getSelectedItem().toString();
-                String consultorio_seleccionado = consultoriosDisponibles.getSelectedItem().toString();
+                    //Extraemos los datos de los campos de texto
+                    int numeroDeCita = siguienteIndice;
+                    String nombre_paciente = nombrePaciente.getText();
+                    String apellido_paterno = apellidoPaterno.getText();
+                    String apellido_materno = apellidoMaterno.getText();
+                    String descripcion_cita = descripcion.getText();
 
-                
-                buscarRepetido(fecha_cita, hora_cita, consultorio_seleccionado);
-                
+                    //Procesamos las fechas para convertirlas al formato '01-01-2000'
+                    long f_nacimiento = fechaNacimiento.getDate().getTime();       
+                    java.sql.Date fecha_nacimiento = new java.sql.Date(f_nacimiento);
 
-                if(existeEsaFecha.equals(true) && existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
-                    JOptionPane.showMessageDialog(null, "Lo sentimos, este horario no está disponible");
-                }else{   
-                    // Unificamos todos los datos de la cita en una sola línea 
-                    String nuevaCita;
-                    nuevaCita = numeroDeCita + ",";
-                    nuevaCita = nuevaCita + nombre_paciente + ",";
-                    nuevaCita = nuevaCita + apellido_paterno +",";
-                    nuevaCita = nuevaCita + apellido_materno+",";
-                    nuevaCita = nuevaCita + fecha_nacimiento+",";
-                    nuevaCita = nuevaCita + fecha_cita+",";
-                    nuevaCita = nuevaCita + hora_cita+",";
-                    nuevaCita = nuevaCita + consultorio_seleccionado+",";
-                    nuevaCita = nuevaCita + descripcion_cita;
-                    // Insertamos los datos al archivo
-                    flujo.write(nuevaCita);
-                    flujo.flush();
-                    flujo.newLine();
-                    JOptionPane.showMessageDialog(null,"Hemos guardado correctamente la cita");
-                    limpiarCampos();
-                    resetearIndice();
-                    llenarTable();
+                    //Extreamos los datos de las listas o ComboBox 
+                    String hora_cita = horaCita.getSelectedItem().toString();
+                    String consultorio_seleccionado = consultoriosDisponibles.getSelectedItem().toString();
 
-                }
-            } catch (IOException e) {
-                System.out.println("Error al guardar cita: " + e.getMessage());
-            }finally{
-                try{
-                    flujo.close();
-                }catch(IOException e){
-                    System.out.println("Error al cerrar buffer al guardar cita: " + e.getMessage());
+
+                    buscarRepetido(hora_cita, consultorio_seleccionado);
+
+
+                    if(existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
+                        JOptionPane.showMessageDialog(null, "Lo sentimos, este horario no está disponible");
+                    }else{   
+                        // Unificamos todos los datos de la cita en una sola línea 
+                        String nuevaCita;
+                        nuevaCita = numeroDeCita + ",";
+                        nuevaCita = nuevaCita + nombre_paciente + ",";
+                        nuevaCita = nuevaCita + apellido_paterno +",";
+                        nuevaCita = nuevaCita + apellido_materno+",";
+                        nuevaCita = nuevaCita + fecha_nacimiento+",";
+                        nuevaCita = nuevaCita + hora_cita+",";
+                        nuevaCita = nuevaCita + consultorio_seleccionado+",";
+                        nuevaCita = nuevaCita + descripcion_cita;
+                        // Insertamos los datos al archivo
+                        flujo.write(nuevaCita);
+                        flujo.flush();
+                        flujo.newLine();
+                        JOptionPane.showMessageDialog(null,"Hemos guardado correctamente la cita");
+                        limpiarCampos();
+                        resetearIndice();
+                        llenarTable();
+
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error al guardar cita: " + e.getMessage());
+                }finally{
+                    try{
+                        flujo.close();
+                    }catch(IOException e){
+                        System.out.println("Error al cerrar buffer al guardar cita: " + e.getMessage());
+                    }
                 }
             }
         }
     }//GEN-LAST:event_guardarCitaActionPerformed
 
     
-    public void buscarRepetido(java.sql.Date fecha_cita,String hora_cita, String consultorio_seleccionado){
-    	String fecha_seleccionada,linea;
+    public void buscarRepetido(String hora_cita, String consultorio_seleccionado){
+    	String linea;
         BufferedReader br = null;
         try {
             br = new BufferedReader( new FileReader(nombreDeArchivo) );
-            fecha_seleccionada = String.valueOf(fecha_cita);
-            existeEsaFecha = false;
+          
+       
             existeEsaHora = false;
             existeEseConsultorio = false;
          
@@ -432,12 +404,10 @@ public class Agendar extends javax.swing.JInternalFrame {
                     i++;
                 }
                 
-                boolean existeLaFecha = datos[5].toString().equals(fecha_seleccionada);
-                boolean existeLaHora = datos[6].toString().equals(hora_cita);
-                boolean estaOcupado = datos[7].toString().equals(consultorio_seleccionado);
+                boolean existeLaHora = datos[5].toString().equals(hora_cita);
+                boolean estaOcupado = datos[6].toString().equals(consultorio_seleccionado);
                 
-                if(existeLaFecha && existeLaHora && estaOcupado){
-                    existeEsaFecha = true;  
+                if(existeLaHora && estaOcupado){                  
                     existeEsaHora = true;
                     existeEseConsultorio = true;
                     indiceDeRepetido = datos[0].toString();
@@ -464,24 +434,57 @@ public class Agendar extends javax.swing.JInternalFrame {
     }
     
     private void agregarConsultorios(){
+        String[] consultorio = {
+            "alpa",
+            "beta",
+            "gamma",
+            "delta",
+            "epsilon",
+            "dseta",
+            "eta",
+            "zeta",
+            "iota",
+            "kappa"
+        }; 
+        
+    
         BufferedReader br = null;
         String linea;
         try{
-            br = new BufferedReader( new FileReader(rutaConsultorio));
+            br = new BufferedReader( new FileReader(nombreDeArchivo));
             
+            ArrayList consultoriosOcupados = new ArrayList();
             while( ( linea = br.readLine() ) != null ) {
-                Object[] datos = new Object[2];
+                Object[] datos = new Object[8];
                 int i = 0;
                 StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
-                
+
                 while(cadenaDeTexto.hasMoreTokens()){  
                     String token = cadenaDeTexto.nextToken();
                     datos[i] = token;
                     i++;
-                } 
-                
-                consultoriosDisponibles.addItem(datos[1]);           
-            }            
+                }  
+                if(datos[5].toString().equals(horaCita.getSelectedItem())){                   
+                    consultoriosOcupados.add(datos[6].toString());                 
+                }
+            
+            }
+          
+            int longitud = consultoriosOcupados.size();
+       
+            for(int t = 0; t<consultorio.length; t++){
+                boolean ocupado = false;
+                for(int g = 0; g<longitud; g++){                 
+                    if(consultorio[t].equals(consultoriosOcupados.get(g))){
+                        ocupado = true;
+                    }                  
+                }
+                if(ocupado == false){
+                    consultoriosDisponibles.addItem(consultorio[t]);
+                }
+                ocupado = false;
+            }           
+            
         }catch(IOException e){
             System.out.println("Error al cargar horas: " + e.getMessage());
         } finally{
@@ -497,10 +500,12 @@ public class Agendar extends javax.swing.JInternalFrame {
         apellidoPaterno.setText("");
         apellidoMaterno.setText("");
         descripcion.setText("");
-        horaCita.setSelectedIndex(0);
-        consultoriosDisponibles.setSelectedIndex(0);
         inicializarFechas();
         nombrePaciente.requestFocus();
+        horaCita.removeAllItems();
+        listaHoras.inicializar(ruta, horaCita);
+        consultoriosDisponibles.removeAllItems();
+        agregarConsultorios();
         
     }
     
@@ -511,7 +516,6 @@ public class Agendar extends javax.swing.JInternalFrame {
             "Apellido_Paterno", 
             "Apellido_Materno",
             "Fecha_Nacimiento",
-            "Fecha_Cita",
             "Hora_cita",
             "Consultorio",
             "Descripción"
@@ -533,7 +537,7 @@ public class Agendar extends javax.swing.JInternalFrame {
                  br = new BufferedReader( new FileReader(nombreDeArchivo));      
 
                 while( ( linea = br.readLine() ) != null ) {
-                    Object[] datos = new Object[9];
+                    Object[] datos = new Object[8];
                     int i = 0;
                     StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
 
@@ -572,29 +576,26 @@ public class Agendar extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_eliminarCitaActionPerformed
     
     private void modificarCita(){
-        if(!indiceCita.getText().equals("")){
+        if(!indiceCita.getText().equals(String.valueOf(siguienteIndice))){
             if(validarCampos() != null){
                 long f_nacimiento = fechaNacimiento.getDate().getTime();
                 java.sql.Date fecha_nacimiento = new java.sql.Date(f_nacimiento);
-                long f_cita = fechaCita.getDate().getTime();
-                java.sql.Date fecha_cita = new java.sql.Date(f_cita);
                 String hora_cita = horaCita.getSelectedItem().toString();
                 String consultorio_seleccionado = consultoriosDisponibles.getSelectedItem().toString();
-                buscarRepetido(fecha_cita, hora_cita, consultorio_seleccionado);
                 
-                if(existeEsaFecha.equals(true) && existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
+                buscarRepetido(hora_cita, consultorio_seleccionado);
+                if(existeEsaHora.equals(true) && existeEseConsultorio.equals(true)){
                                         
                     if(indiceCita.getText().equals(indiceDeRepetido)){
-                        String [] nuevosDatos = new String[9];
+                        String [] nuevosDatos = new String[8];
                         nuevosDatos[0] = indiceCita.getText();
                         nuevosDatos[1] = nombrePaciente.getText();
                         nuevosDatos[2] = apellidoPaterno.getText();
                         nuevosDatos[3] = apellidoMaterno.getText();
                         nuevosDatos[4] = String.valueOf(fecha_nacimiento);
-                        nuevosDatos[5] = String.valueOf(fecha_cita);
-                        nuevosDatos[6] = horaCita.getSelectedItem().toString();
-                        nuevosDatos[7] = consultoriosDisponibles.getSelectedItem().toString();
-                        nuevosDatos[8] = descripcion.getText();  
+                        nuevosDatos[5] = horaCita.getSelectedItem().toString();
+                        nuevosDatos[6] = consultoriosDisponibles.getSelectedItem().toString();
+                        nuevosDatos[7] = descripcion.getText();  
                         opciones.modificar(ruta, temporal, nuevosDatos);
                         resetearIndice();
                         limpiarCampos();
@@ -604,16 +605,15 @@ public class Agendar extends javax.swing.JInternalFrame {
                     }
                 }else{   
                     
-                    String [] nuevosDatos = new String[9];
+                    String [] nuevosDatos = new String[8];
                     nuevosDatos[0] = indiceCita.getText();
                     nuevosDatos[1] = nombrePaciente.getText();
                     nuevosDatos[2] = apellidoPaterno.getText();
                     nuevosDatos[3] = apellidoMaterno.getText();
                     nuevosDatos[4] = String.valueOf(fecha_nacimiento);
-                    nuevosDatos[5] = String.valueOf(fecha_cita);
-                    nuevosDatos[6] = horaCita.getSelectedItem().toString();
-                    nuevosDatos[7] = consultoriosDisponibles.getSelectedItem().toString();
-                    nuevosDatos[8] = descripcion.getText();  
+                    nuevosDatos[5] = horaCita.getSelectedItem().toString();
+                    nuevosDatos[6] = consultoriosDisponibles.getSelectedItem().toString();
+                    nuevosDatos[7] = descripcion.getText();  
                     opciones.modificar(ruta, temporal, nuevosDatos);
                     resetearIndice();
                     limpiarCampos();
@@ -652,25 +652,7 @@ public class Agendar extends javax.swing.JInternalFrame {
         nombrePaciente.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 1)));
         apellidoPaterno.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 2)));
         apellidoMaterno.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 3)));
-        descripcion.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 8)));
-        int indiceHora = 0;
-        int indiceConsultorio = 0;
-        for(int i = 0; i < horaCita.getItemCount(); i++){
-            horaCita.setSelectedIndex(i);
-            if(String.valueOf(tablaCitas.getValueAt(indiceFila, 6)).equals(horaCita.getSelectedItem().toString())){
-                indiceHora = i;
-            }
-        }
-        horaCita.setSelectedIndex(indiceHora);
-        
-        for(int i = 0; i < horaCita.getItemCount(); i++){
-            consultoriosDisponibles.setSelectedIndex(i);
-            if(String.valueOf(tablaCitas.getValueAt(indiceFila, 7)).equals(consultoriosDisponibles.getSelectedItem().toString())){
-                indiceConsultorio = i;
-            }
-        }
-        consultoriosDisponibles.setSelectedIndex(indiceConsultorio);
-        
+        //Cargamos la fecha de nacimiento 
         SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy-MM-dd");
         Date nuevaFechaNacimiento;
         try{
@@ -680,18 +662,64 @@ public class Agendar extends javax.swing.JInternalFrame {
             System.out.println("Error al transformar fecha nacimiento: " + e.getMessage());
         }
         
-        Date nuevaFechaCita;
-        try{
-            nuevaFechaCita = formatoFecha.parse(String.valueOf(tablaCitas.getValueAt(indiceFila, 5)));
-            fechaCita.setDate(nuevaFechaCita);
-        }catch(ParseException e){
-            System.out.println("Error al transformar fecha cita: " + e.getMessage());
-        }
+        //Cargamos la hora
+        String hora_seleccionada = String.valueOf(tablaCitas.getValueAt(indiceFila,5));
+        horaSeleccionada = hora_seleccionada;
+        haSeleccionadoTabla = true;
+        horaCita.removeAllItems();
+        if(haSeleccionadoTabla){
+            listaHoras.inicializar(ruta, horaCita);
+            boolean encontrado = false;
+            int indice = 0;
+            for(int i = 0; i<horaCita.getItemCount();i++){
+                horaCita.setSelectedIndex(i);
+                if(horaCita.getSelectedItem().equals(hora_seleccionada)){
+                    encontrado = true;
+                    indice = i;
+                }
+            }
+            horaCita.setSelectedIndex(indice);
+            if(!encontrado){
+                horaCita.addItem(String.valueOf(tablaCitas.getValueAt(indiceFila,5)));
+                horaCita.setSelectedIndex(horaCita.getItemCount() - 1);
+            }
+            
+            //Cargamos los consultorios
+            consultoriosDisponibles.removeAllItems();
+             agregarConsultorios();
+            consultoriosDisponibles.addItem(String.valueOf(tablaCitas.getValueAt(indiceFila,6)));
+            consultoriosDisponibles.setSelectedIndex(consultoriosDisponibles.getItemCount() - 1);
+            consultorioCargado = String.valueOf(tablaCitas.getValueAt(indiceFila,6));
+            
+            //Cargamos la descripcion
+            descripcion.setText(String.valueOf(tablaCitas.getValueAt(indiceFila, 7)));
+            
+        }   
+        
+        
+       
     }//GEN-LAST:event_tablaCitasMouseClicked
+
+    private void horaCitaItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_horaCitaItemStateChanged
+        
+        if(haSeleccionadoTabla == true){      
+            //Cargamos los consultorios
+            consultoriosDisponibles.removeAllItems();
+             agregarConsultorios();
+            if(horaSeleccionada.equals(horaCita.getSelectedItem())){
+                consultoriosDisponibles.addItem(consultorioCargado);
+                
+            }
+            consultoriosDisponibles.setSelectedIndex(0);
+        }else{
+            consultoriosDisponibles.removeAllItems();
+             agregarConsultorios();
+        }
+                
+    }//GEN-LAST:event_horaCitaItemStateChanged
     
     private void inicializarFechas(){
         fechaNacimiento.setDate(new Date());
-        fechaCita.setDate(new Date());
     }
     
     private Boolean validarCampos(){
@@ -728,7 +756,6 @@ public class Agendar extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox consultoriosDisponibles;
     private javax.swing.JTextArea descripcion;
     private javax.swing.JButton eliminarCita;
-    private com.toedter.calendar.JDateChooser fechaCita;
     private com.toedter.calendar.JDateChooser fechaNacimiento;
     private javax.swing.JButton guardarCita;
     private javax.swing.JComboBox horaCita;
@@ -738,7 +765,6 @@ public class Agendar extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;

@@ -37,7 +37,7 @@ public class OpcionesArchivo {
                 while((linea = br.readLine()) != null){        
                     StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
                     int i = 0;
-                    Object[] indices = new Object[9];
+                    Object[] indices = new Object[8];
                     while(cadenaDeTexto.hasMoreTokens()){
                         String token = cadenaDeTexto.nextToken();
                         indices[i] = token;
@@ -97,7 +97,7 @@ public class OpcionesArchivo {
             String contenido = "";
             while((linea = br.readLine()) != null){
                 int i = 0;
-                Object[] datos = new Object[9];
+                Object[] datos = new Object[8];
                 StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
                 
                 while(cadenaDeTexto.hasMoreTokens()){
@@ -141,7 +141,7 @@ public class OpcionesArchivo {
     }
     
     public void modificar(String ruta, String temporal, String[] nuevosDatos){
-        
+        System.out.println(nuevosDatos.length);
         String indiceSiguiente = String.valueOf(calcularSiguienteIndice(ruta));
         String id = nuevosDatos[0];
         if(!id.equals(indiceSiguiente)){
@@ -160,7 +160,7 @@ public class OpcionesArchivo {
 
                 while((linea = br.readLine()) != null){
                     int i = 0;
-                    Object[] datos = new Object[9];
+                    Object[] datos = new Object[8];
                     StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
 
                     while(cadenaDeTexto.hasMoreTokens()){
@@ -208,4 +208,9 @@ public class OpcionesArchivo {
             JOptionPane.showMessageDialog(null,"Debes seleccionar una cita");
         }
     }
-}
+    /*
+    public static void main(String args[]){
+        System.out.println(calcularSiguienteIndice("C:\\Hospital\\Citas.txt"));
+    }*/
+ }
+

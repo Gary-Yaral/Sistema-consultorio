@@ -2,56 +2,90 @@
 package consultorio;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.StringTokenizer;
+import javax.swing.JComboBox;
 
 public class Horas {
-    
-    public static void main(String args[]){
-        buscarHoras("C:\\Hospital\\Citas.txt","2021-08-15");
-    }
-    
-    public static void buscarHoras(String ruta,String fechaSeleccionada){
+     
+    public void inicializar(String ruta,JComboBox horaCita){
+        String[] horas = new String[8];
+        boolean[] horasOcupadas = new boolean[8];
+        int indice = 0;
+        for(int i = 9; i<= 16; i++){
+                if(i != 9){
+                    horas[indice] = String.valueOf(i+"h00");                 
+                }else{
+                    horas[indice] = String.valueOf("0"+i+"h00");           
+                }
+                indice++;
+            }
         
-        BufferedReader br = null;
-        FileReader fr = null;
-        String linea;
-        try{
-            fr = new FileReader(ruta);
-            br = new BufferedReader(fr);
-            ArrayList horas = new ArrayList();
-            while((linea = br.readLine()) != null){
-                Object[] datos = new Object[9];
-                int i = 0;
-                StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
+        File archivo = new File(ruta);
+        if(archivo.length() == 0){
+            for(String hora: horas){
+                    horaCita.addItem(hora);            
+            }
+        }
+        
+        if(archivo.length() != 0){
+              
+            BufferedReader br = null;
+            String linea;
+            try{
+                br = new BufferedReader( new FileReader(ruta));
+                //Recorreamos todas las horas buscando cual está full
+                for(int j = 0; j< horas.length; j++){
+                    int numeroDeRepeticiones = 0;                  
+                    while( ( linea = br.readLine() ) != null ) {
+                        
+                        Object[] datos = new Object[8];
+                        int i = 0;
+                        StringTokenizer cadenaDeTexto = new StringTokenizer(linea,",");
 
-                while(cadenaDeTexto.hasMoreTokens()){  
-                    String token = cadenaDeTexto.nextToken();
-                    datos[i] = token;
-                    i++;
+                        while(cadenaDeTexto.hasMoreTokens()){  
+                            String token = cadenaDeTexto.nextToken();
+                            datos[i] = token;
+                            i++;
+                        }
+                       //Verificamos cuantos consultorios tienen esa hora ocupada
+                        if(datos[5].toString().equals(horas[j])){
+                            numeroDeRepeticiones++;
+                        }                      
+                        
+                    }
+                    
+                    //Activamos o desactivamos las horas si está ocupadas o no
+                    if(numeroDeRepeticiones != 10){
+                        horasOcupadas[j] = false;
+                    }else{
+                        horasOcupadas[j] = true;
+                    }
+                }
+                int full = 0;
+                
+                for(int h = 0; h<horasOcupadas.length; h++){
+                    if(horasOcupadas[h] == false){
+                        horaCita.addItem(horas[h]); 
+                    }else{
+                        full++;
+                    }
                 }
                 
-                if(datos[5].toString().equals(fechaSeleccionada)){
-                   horas.add(datos[6].toString());
+                if(full == 10){
+                    horaCita.addItem("No hay disponible"); 
                 }
-            }
-            
-            int longitud = horas.size();
-            for(int i = 0; i < longitud; i++){
-                System.out.println(horas.get(i));
-            }
-            
-        }catch(IOException e){
-            System.out.println("Error al buscar horas disponibles" + e.getMessage());
-        }finally{
-            try{
-                br.close();
+                
             }catch(IOException e){
-            System.out.println("Error al buscar horas disponibles" + e.getMessage());
-            }
+                System.out.println("Error al cargar horas: " + e.getMessage());
+            } finally{
+                try{
+                    br.close();
+                }catch(IOException e){
+                }
+            } 
         }
     }
 }
