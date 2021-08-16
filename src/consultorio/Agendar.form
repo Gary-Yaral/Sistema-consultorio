@@ -120,7 +120,7 @@
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-                                          <Component id="eliminarCita" min="-2" pref="122" max="-2" attributes="0"/>
+                                          <Component id="cancelarCita" min="-2" pref="122" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                                           <Component id="limpiarCampos" min="-2" pref="122" max="-2" attributes="0"/>
                                       </Group>
@@ -183,7 +183,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="guardarCita" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                       <Component id="modificarCita" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
-                      <Component id="eliminarCita" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                      <Component id="cancelarCita" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                       <Component id="limpiarCampos" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
@@ -268,7 +268,7 @@
             <Property name="text" type="java.lang.String" value="Agendar Cita "/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="eliminarCita">
+        <Component class="javax.swing.JButton" name="cancelarCita">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="33" green="0" red="ff" type="rgb"/>
@@ -279,7 +279,7 @@
             <Property name="text" type="java.lang.String" value="Cancelar"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eliminarCitaActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelarCitaActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="guardarCita">
@@ -342,8 +342,6 @@
           </Properties>
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="horaCitaItemStateChanged"/>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="horaCitaMouseClicked"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="horaCitaActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="consultoriosDisponibles">
@@ -354,9 +352,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="nombrePaciente">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nombrePacienteActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="apellidoPaterno">
         </Component>

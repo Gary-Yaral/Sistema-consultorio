@@ -120,9 +120,7 @@ public class OpcionesArchivo {
         }finally{
             try{
                 br.close();
-                bw.close();
-                
-               
+                bw.close();           
             }catch(IOException e){
                 System.out.println("Error al cerrar buffer: "+ e.getMessage());
             }
@@ -132,7 +130,7 @@ public class OpcionesArchivo {
     public void eliminarRegistro(String ruta, String temporal, String id){
         String indiceSiguiente = String.valueOf(calcularSiguienteIndice(ruta));
         if(!id.equals(indiceSiguiente)){
-            String mensaje = "Hemos eliminado la cita";
+            String mensaje = "Hemos cancelado la cita";
             eliminar(ruta, temporal, id);
             cambiarNombre(temporal,ruta,mensaje);
         }else{
@@ -208,9 +206,6 @@ public class OpcionesArchivo {
             JOptionPane.showMessageDialog(null,"Debes seleccionar una cita");
         }
     }
-    /*
-    public static void main(String args[]){
-        System.out.println(calcularSiguienteIndice("C:\\Hospital\\Citas.txt"));
-    }*/
+  
  }
 
