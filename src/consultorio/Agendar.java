@@ -504,12 +504,15 @@ public class Agendar extends javax.swing.JInternalFrame {
     }
     //Boton para cancelar
     private void cancelarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarCitaActionPerformed
-        if(!indiceCita.getText().equals("")){
+        if(!indiceCita.getText().equals(String.valueOf(siguienteIndice))){
             String id = indiceCita.getText();
             opciones.eliminarRegistro(ruta, temporal, id);
             resetearIndice();
             limpiarCampos();
             llenarTable();
+        }else{
+            JOptionPane.showMessageDialog(null,"No has seleccionado una cita para eliminar");
+            limpiarCampos();
         }
     }//GEN-LAST:event_cancelarCitaActionPerformed
     

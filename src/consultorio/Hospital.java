@@ -70,6 +70,7 @@ public class Hospital extends javax.swing.JFrame {
         menuCitas.setText("Citas");
 
         opcionesCitas.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        opcionesCitas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/1622833_checkmark_done_exam_list_pencil_icon.png"))); // NOI18N
         opcionesCitas.setText("Opciones");
         opcionesCitas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,6 +80,7 @@ public class Hospital extends javax.swing.JFrame {
         menuCitas.add(opcionesCitas);
 
         verCitas.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        verCitas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/3844411_eye_see_show_view_watch_icon.png"))); // NOI18N
         verCitas.setText("Ver todas");
         verCitas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -92,6 +94,7 @@ public class Hospital extends javax.swing.JFrame {
         menuConsultorios.setText("Consultorios");
 
         verConsultorios.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
+        verConsultorios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/532711_application_browser_eye_see_view_icon.png"))); // NOI18N
         verConsultorios.setText("Ver todos");
         verConsultorios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -105,6 +108,7 @@ public class Hospital extends javax.swing.JFrame {
         menuMedicamentos.setText("Medicamentos");
 
         opcionesMedicamentos.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        opcionesMedicamentos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/5986146_check_checklist_coronavirus_document_list_icon.png"))); // NOI18N
         opcionesMedicamentos.setText("Opciones");
         opcionesMedicamentos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,6 +118,7 @@ public class Hospital extends javax.swing.JFrame {
         menuMedicamentos.add(opcionesMedicamentos);
 
         verMedicamentos.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        verMedicamentos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/3844411_eye_see_show_view_watch_icon.png"))); // NOI18N
         verMedicamentos.setText("Ver todos");
         verMedicamentos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
