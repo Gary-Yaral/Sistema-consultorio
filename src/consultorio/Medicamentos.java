@@ -90,7 +90,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                     flujo = new BufferedWriter( new FileWriter(ruta,true));
                     //Extraemos los datos de los campos de texto
                     String id = registro.getText();
-                    String codigo_medicamento = codigo.getText();
+                    String codigo_medicamento = codigo.getText().toLowerCase();
                     String nombre_comercial = nombreComercial.getText();
                     String principio_activo = principioActivo.getText();
                     String tipo_medicamento = tipoMedicamento.getSelectedItem().toString();
@@ -111,7 +111,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                     flujo.write(nuevoMedicamento);
                     flujo.flush();
                     flujo.newLine();
-                    JOptionPane.showMessageDialog(null,"Se guardo");
+                    JOptionPane.showMessageDialog(null,"Hemos registrado el producto");
                     limpiarCampos();
       
                 }catch(IOException e){
@@ -199,14 +199,14 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                 String id = registro.getText();
                 String[] nuevosDatos = new String[7];
                 nuevosDatos[0] = id;
-                nuevosDatos[1] = codigo.getText();
+                nuevosDatos[1] = codigo.getText().toLowerCase();
                 nuevosDatos[2] = nombreComercial.getText();
                 nuevosDatos[3] = principioActivo.getText();
                 nuevosDatos[4] = tipoMedicamento.getSelectedItem().toString();
                 nuevosDatos[5] = gramajePeso.getText();       
                 nuevosDatos[6] = stock.getText();
-                boolean envioMismoCodigo = buscarRepetido(codigo.getText()) == true && registro.getText().equals(indiceDeRepetido);
-                boolean noEstaRepetido =  buscarRepetido(codigo.getText()) != true;
+                boolean envioMismoCodigo = buscarRepetido(nuevosDatos[1]) == true && registro.getText().equals(indiceDeRepetido);
+                boolean noEstaRepetido =  buscarRepetido(nuevosDatos[1]) != true;
                 if(envioMismoCodigo){
                     try {
                         fr = new FileReader(ruta);
@@ -628,7 +628,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                         .addComponent(eliminarMedicamento)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(40, 40, 40))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
