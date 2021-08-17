@@ -113,8 +113,9 @@ public class Agendar extends javax.swing.JInternalFrame {
 
         jLabel8.setText("Descripción");
 
-        modificarCita.setBackground(new java.awt.Color(102, 102, 255));
-        modificarCita.setForeground(new java.awt.Color(255, 255, 255));
+        modificarCita.setBackground(new java.awt.Color(204, 204, 255));
+        modificarCita.setForeground(new java.awt.Color(0, 102, 153));
+        modificarCita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/editar.png"))); // NOI18N
         modificarCita.setText("Modificar");
         modificarCita.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -125,8 +126,9 @@ public class Agendar extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel9.setText("Agendar Cita ");
 
-        cancelarCita.setBackground(new java.awt.Color(255, 0, 51));
-        cancelarCita.setForeground(new java.awt.Color(255, 255, 255));
+        cancelarCita.setBackground(new java.awt.Color(204, 204, 255));
+        cancelarCita.setForeground(new java.awt.Color(0, 102, 153));
+        cancelarCita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/eliminar2.png"))); // NOI18N
         cancelarCita.setText("Cancelar");
         cancelarCita.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -134,8 +136,9 @@ public class Agendar extends javax.swing.JInternalFrame {
             }
         });
 
-        guardarCita.setBackground(new java.awt.Color(51, 153, 0));
-        guardarCita.setForeground(new java.awt.Color(255, 255, 255));
+        guardarCita.setBackground(new java.awt.Color(204, 204, 255));
+        guardarCita.setForeground(new java.awt.Color(0, 102, 153));
+        guardarCita.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/guarda_azul.png"))); // NOI18N
         guardarCita.setText("Guardar");
         guardarCita.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -143,8 +146,9 @@ public class Agendar extends javax.swing.JInternalFrame {
             }
         });
 
-        limpiarCampos.setBackground(new java.awt.Color(255, 255, 255));
-        limpiarCampos.setForeground(new java.awt.Color(102, 102, 255));
+        limpiarCampos.setBackground(new java.awt.Color(204, 204, 255));
+        limpiarCampos.setForeground(new java.awt.Color(0, 102, 153));
+        limpiarCampos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/iconos/limpiar.png"))); // NOI18N
         limpiarCampos.setText("Limpiar");
         limpiarCampos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
