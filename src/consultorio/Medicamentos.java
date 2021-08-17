@@ -111,7 +111,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                     flujo.write(nuevoMedicamento);
                     flujo.flush();
                     flujo.newLine();
-                    JOptionPane.showMessageDialog(null,"Hemos registrado el producto");
+                    JOptionPane.showMessageDialog(null,"Hemos registrado el medicamento");
                     limpiarCampos();
       
                 }catch(IOException e){
