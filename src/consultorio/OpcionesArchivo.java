@@ -93,8 +93,7 @@ public class OpcionesArchivo {
             fw = new FileWriter(temporal);
             bw = new BufferedWriter(fw);
             br = new BufferedReader(fr);
-            String lectura = "";
-            String contenido = "";
+           
             while((linea = br.readLine()) != null){
                 int i = 0;
                 Object[] datos = new Object[8];
@@ -139,7 +138,6 @@ public class OpcionesArchivo {
     }
     
     public void modificar(String ruta, String temporal, String[] nuevosDatos){
-        System.out.println(nuevosDatos.length);
         String indiceSiguiente = String.valueOf(calcularSiguienteIndice(ruta));
         String id = nuevosDatos[0];
         if(!id.equals(indiceSiguiente)){
