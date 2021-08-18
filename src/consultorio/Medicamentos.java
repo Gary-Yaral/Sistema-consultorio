@@ -251,7 +251,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                         try{
                             br.close();
                             bw.close();
-                            cambiarNombre();
+                            cambiarNombre("Hemos modificado datos del medicamento");
                             limpiarCampos();
                         }catch(IOException e){
                            System.out.println("Error al cerrar flujo: " + e.getMessage()); 
@@ -303,7 +303,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
                         try{
                             br.close();
                             bw.close();
-                            cambiarNombre();
+                            cambiarNombre("Hemos eliminado el medicamento");
                             limpiarCampos();
                         }catch(IOException e){
                            System.out.println("Error al cerrar flujo: " + e.getMessage()); 
@@ -356,13 +356,13 @@ public class Medicamentos extends javax.swing.JInternalFrame {
         return false;
     }
     
-    public void cambiarNombre(){
+    public void cambiarNombre(String mensaje){
         File archivoAnterior = new File(ruta);
         File archivoNuevo = new File(ruta_temporal);
         if(archivoAnterior.exists() && archivoNuevo.exists()){
             if(archivoAnterior.delete()){ 
                 if(archivoNuevo.renameTo(archivoAnterior)){
-                    JOptionPane.showMessageDialog(null,"Hemos modificado el medicamento");
+                    JOptionPane.showMessageDialog(null,mensaje);
                 }
             }
         }
@@ -407,7 +407,7 @@ public class Medicamentos extends javax.swing.JInternalFrame {
             try{
                 br.close();
                 bw.close();
-                cambiarNombre();
+                cambiarNombre("Hemos modificado el medicamento");
             }catch(IOException e){
                 System.out.println("Error al cerrar buffer: "+ e.getMessage());
             }
